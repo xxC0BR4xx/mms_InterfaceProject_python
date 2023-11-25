@@ -157,7 +157,7 @@ def is_index_left(results, img):
 
     return True
 
-
+#TODO: change hand_closed, so also right hand gets triggerd
 def hand_closed(hand_landmarks):
     fingers_idx_TIP = [
         mp_hands.HandLandmark.INDEX_FINGER_TIP, mp_hands.HandLandmark.MIDDLE_FINGER_TIP,
