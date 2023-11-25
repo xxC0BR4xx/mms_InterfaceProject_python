@@ -8,6 +8,11 @@ mp_drawing = mp.solutions.drawing_utils
 
 
 def is_thumb_up(results, img):
+    fingers_idx = [
+        mp_hands.HandLandmark.INDEX_FINGER_TIP, mp_hands.HandLandmark.MIDDLE_FINGER_TIP,
+        mp_hands.HandLandmark.RING_FINGER_TIP, mp_hands.HandLandmark.PINKY_TIP
+    ]
+
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
             mp_drawing.draw_landmarks(img,
@@ -17,22 +22,12 @@ def is_thumb_up(results, img):
                                       drawing_styles.get_default_hand_connections_style()
                                       )
 
-            thumb_left_up = thumb_is_up_left(hand_landmarks)
-            thumb_right_up = thumb_is_up_right(hand_landmarks)
-            hand_open_left = hand_open_thumb_left(hand_landmarks)
-            hand_open_right = hand_open_thumb_right(hand_landmarks)
+            for finger in fingers_idx:
+                if (hand_landmarks.landmark[finger].y < hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].y
+                        ):
+                    return False
 
-            if thumb_left_up and not hand_open_left:
-                print("thumb left")
-                return True
-            if thumb_right_up and not hand_open_right:
-                print("thumb right")
-                return True
-            if only_thumb_up(hand_landmarks):
-                print("only thumb")
-                return True
-
-        return False
+    return True
 
 
 def thumb_is_up_right(hand_landmarks):
@@ -96,8 +91,8 @@ def only_thumb_up(hand_landmarks):
 
 def is_thumb_down(results, img):
     fingers_idx = [
-        mp_hands.HandLandmark.INDEX_FINGER_DIP, mp_hands.HandLandmark.MIDDLE_FINGER_DIP,
-        mp_hands.HandLandmark.RING_FINGER_DIP, mp_hands.HandLandmark.PINKY_DIP
+        mp_hands.HandLandmark.INDEX_FINGER_TIP, mp_hands.HandLandmark.MIDDLE_FINGER_TIP,
+        mp_hands.HandLandmark.RING_FINGER_TIP, mp_hands.HandLandmark.PINKY_TIP
     ]
 
     if results.multi_hand_landmarks:
@@ -110,8 +105,54 @@ def is_thumb_down(results, img):
                                       )
 
             for finger in fingers_idx:
-                if (hand_landmarks.landmark[finger].x > hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].x
+                if (hand_landmarks.landmark[finger].y > hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].y
                         or not hand_closed(hand_landmarks)):
+                    return False
+
+    return True
+
+
+def is_index_right(results, img):
+    fingers_idx = [
+        mp_hands.HandLandmark.INDEX_FINGER_DIP, mp_hands.HandLandmark.MIDDLE_FINGER_DIP,
+        mp_hands.HandLandmark.RING_FINGER_DIP, mp_hands.HandLandmark.PINKY_DIP, mp_hands.HandLandmark.THUMB_TIP
+    ]
+
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            mp_drawing.draw_landmarks(img,
+                                      hand_landmarks,
+                                      mp_hands.HAND_CONNECTIONS,
+                                      drawing_styles.get_default_hand_landmarks_style(),
+                                      drawing_styles.get_default_hand_connections_style()
+                                      )
+
+            for finger in fingers_idx:
+                if (hand_landmarks.landmark[finger].x < hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x
+                or not right_index_closed):
+                    return False
+
+    return True
+
+
+def is_index_left(results, img):
+    fingers_idx = [
+        mp_hands.HandLandmark.INDEX_FINGER_DIP, mp_hands.HandLandmark.MIDDLE_FINGER_DIP,
+        mp_hands.HandLandmark.RING_FINGER_DIP, mp_hands.HandLandmark.PINKY_DIP, mp_hands.HandLandmark.THUMB_TIP
+    ]
+
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            mp_drawing.draw_landmarks(img,
+                                      hand_landmarks,
+                                      mp_hands.HAND_CONNECTIONS,
+                                      drawing_styles.get_default_hand_landmarks_style(),
+                                      drawing_styles.get_default_hand_connections_style()
+                                      )
+
+            for finger in fingers_idx:
+                if (hand_landmarks.landmark[finger].x > hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x
+                       and not left_index_closed()):
                     return False
 
     return True
@@ -136,6 +177,28 @@ def hand_closed(hand_landmarks):
 
     return True
 
+def right_index_closed():
+
+
+    if (mp_hands.HandLandmark.INDEX_FINGER_TIP.x > mp_hands.HandLandmark.INDEX_FINGER_PIP and
+
+        mp_hands.HandLandmark.INDEX_FINGER_TIP < mp_hands.HandLandmark.WRIST.x):
+
+        return False
+
+    return True
+
+def left_index_closed():
+
+
+    if (mp_hands.HandLandmark.INDEX_FINGER_TIP.x > mp_hands.HandLandmark.INDEX_FINGER_PIP and
+
+        mp_hands.HandLandmark.INDEX_FINGER_TIP < mp_hands.HandLandmark.WRIST.x):
+
+        return False
+
+    return True
+
 
 def startDetection():
     capture = cv2.VideoCapture(0)
@@ -156,6 +219,14 @@ def startDetection():
         thumb_is_down = is_thumb_down(results, img)
         if thumb_is_down:
             print("thumb is down")
+
+        index_is_right = is_index_right(results, img)
+        if index_is_right:
+            print("index is right")
+
+        index_is_left = is_index_left(results, img)
+        if index_is_left:
+            print("index is left")
 
         cv2.imshow('Hand Recognition', img)
         cv2.waitKey(0)
