@@ -39,7 +39,7 @@ class Controller(object):
         pass
 
     def clearBrowserFormInputs(self):
-        clear_button = self.driver_find_element(By.ID, "clear_button")
+        clear_button = self.driver.find_element(By.ID, "clear_button")
         if clear_button:
             clear_button.click()
         pass
