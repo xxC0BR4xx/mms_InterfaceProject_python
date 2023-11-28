@@ -4,7 +4,6 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 import hand_detector as hd
-import testdetector as thd
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -30,6 +29,9 @@ class Controller(object):
         pass
 
     def submitFormInputs(self):
+        submit_button = self.driver.find_element(By.ID, "submit_button")
+        if submit_button:
+            submit_button.click()
         pass
 
     def stepForwardInBrowserForm(self):
@@ -41,7 +43,7 @@ class Controller(object):
     def clearBrowserFormInputs(self):
         clear_button = self.driver.find_element(By.ID, "clear_button")
         if clear_button:
-            clear_button.click()
+            clear_button.clear()
         pass
 
 
