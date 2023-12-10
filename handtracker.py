@@ -269,7 +269,6 @@ def is_index_finger_showing_right(hand_landmarks):
 
     for finger in fingers_idx:
         if hand_landmarks.landmark[finger].x <= hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_DIP].x:
-            print("bad")
             return False
 
     return True
